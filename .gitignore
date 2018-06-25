@@ -1,0 +1,3 @@
+*/*.crt
+*/*.key
+test_*/test_*

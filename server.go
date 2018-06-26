@@ -143,7 +143,7 @@ func (s *Server) handleClient(_conn net.Conn, requireKey bool, f func(MessageInf
 					"Name": name,
 				},
 			})
-		} else if msg.Type == "_message" {
+		} else if registered && msg.Type == "_message" {
 			to := msg.Data["To"].(string)
 			message := msg.Data["Message"]
 			if _, ok := s.Connections[to]; ok {

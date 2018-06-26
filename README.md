@@ -32,13 +32,10 @@ On disconnect server generates `{"Type": "_disconnect", "Data": {"Who": "pluginN
 Check `test_client/main.go` and `test_server/main.go` for demos.
 
 ```bash
-$ cd /path/to/particlemsg_go/test_client
-$ go build
-$ bash ../genkey.sh client
-$ cd ../test_server
-$ go build
-$ bash ../genkey.sh server
-$ PMSG_HOST=0.0.0.0 PMSG_PORT=5050 ./test_server
+$ cd /path/to/particlemsg_go/
+$ bash ./genkey.sh pmsg
+$ cd test_server
+$ bash ./start.sh
 Listening on 0.0.0.0:5050
 core: &{_register map[Key:f0e4c2f76c58916ec258f246851bea091d14d4247a2fc3e18694461b1816e13b Name:core]}
 _server: &{_registered map[Name:core]}

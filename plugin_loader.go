@@ -8,7 +8,7 @@ import (
 )
 
 // LoadPlugins - loads plugins listed in ClientConfig
-func LoadPlugins(host, port string, clients *ClientConfig) {
+func LoadPlugins(host, port, crt, key string, clients *ClientConfig) {
 	for _, client := range *clients {
 		if !client.DoNotLoad {
 			go func() {
@@ -27,6 +27,9 @@ func LoadPlugins(host, port string, clients *ClientConfig) {
 						unsafeSSL = "false"
 					}
 
+					crt, _ = filepath.Abs(crt)
+					key, _ = filepath.Abs(key)
+
 					cmd := exec.Command(client.Path)
 					cmd.Stdout = os.Stdout
 					cmd.Stderr = os.Stderr
@@ -37,6 +40,8 @@ func LoadPlugins(host, port string, clients *ClientConfig) {
 						"PMSG_NAME="+client.Name,
 						"PMSG_KEY="+client.Key,
 						"PMSG_UNSAFE_SSL="+unsafeSSL,
+						"PMSG_SSL_CERT="+crt,
+						"PMSG_SSL_KEY="+key,
 					)
 					if err = cmd.Run(); err != nil {
 						panic(err)

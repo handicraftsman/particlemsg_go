@@ -11,7 +11,7 @@ func main() {
 	c := particlemsg.NewClient(os.Getenv("PMSG_NAME"))
 
 	go c.ConnectFromEnv(
-		particlemsg.GetBasicSSLConfig(particlemsg.GetSSLCertFromFiles("./client.crt", "./client.key")),
+		particlemsg.GetBasicSSLConfig(particlemsg.GetSSLCertFromFiles(os.Getenv("PMSG_SSL_CERT"), os.Getenv("PMSG_SSL_KEY"))),
 		func(mi particlemsg.MessageInfo) {
 			fmt.Printf("%s: %v\n", mi.From, mi.Msg)
 			if mi.Msg.Type == "_registered" {

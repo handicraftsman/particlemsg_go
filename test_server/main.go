@@ -10,6 +10,8 @@ import (
 var (
 	host = os.Getenv("PMSG_HOST")
 	port = os.Getenv("PMSG_PORT")
+	crt  = os.Getenv("PMSG_SSL_CERT")
+	key  = os.Getenv("PMSG_SSL_KEY")
 )
 
 func main() {
@@ -22,12 +24,12 @@ func main() {
 		host,
 		port,
 		true,
-		particlemsg.GetBasicSSLConfig(particlemsg.GetSSLCertFromFiles("./server.crt", "./server.key")),
+		particlemsg.GetBasicSSLConfig(particlemsg.GetSSLCertFromFiles(crt, key)),
 		func(mi particlemsg.MessageInfo) {
 			fmt.Printf("%s: %v\n", mi.From, mi.Msg)
 		})
 
-	particlemsg.LoadPlugins("127.0.0.1", port, clients)
+	particlemsg.LoadPlugins("127.0.0.1", port, crt, key, clients)
 
 	<-srv.DoneChan
 }

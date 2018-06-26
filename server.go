@@ -6,6 +6,7 @@ import (
 	"crypto/tls"
 	"fmt"
 	"net"
+	"os"
 	"time"
 )
 
@@ -32,6 +33,17 @@ func (s *Server) LoadClientConfig(clients *ClientConfig) {
 	for _, client := range *clients {
 		s.Keys[client.Name] = fmt.Sprintf("%x", sha256.Sum256([]byte(client.Key)))
 	}
+}
+
+// StartFromEnv - starts the server using PMSG_HOST, PMSG_PORT, and PMSG_REQUIRE_KEYS environment variables
+func (s *Server) StartFromEnv(tcfg *tls.Config, f func(MessageInfo)) {
+	var requireKeys bool
+	if os.Getenv("PMSG_REQUIRE_KEYS") == "false" {
+		requireKeys = false
+	} else {
+		requireKeys = true
+	}
+	s.Start(os.Getenv("PMSG_HOST"), os.Getenv("PMSG_PORT"), requireKeys, tcfg, f)
 }
 
 // Start - starts the server

@@ -2,14 +2,14 @@ package main
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/handicraftsman/particlemsg_go"
 )
 
 var (
-	host         = "0.0.0.0"
-	port         = "5050"
-	allowedHosts = []string{"127.0.0.1"}
+	host = os.Getenv("PMSG_HOST")
+	port = os.Getenv("PMSG_PORT")
 )
 
 func main() {
@@ -27,7 +27,7 @@ func main() {
 			fmt.Printf("%s: %v\n", mi.From, mi.Msg)
 		})
 
-	particlemsg.LoadPlugins(host, port, clients)
+	particlemsg.LoadPlugins("127.0.0.1", port, clients)
 
 	<-srv.DoneChan
 }

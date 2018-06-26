@@ -9,9 +9,8 @@ import (
 func GetBasicSSLConfig(crt tls.Certificate) *tls.Config {
 	if os.Getenv("PMSG_UNSAFE_SSL") == "true" {
 		return &tls.Config{Certificates: []tls.Certificate{crt}, InsecureSkipVerify: true}
-	} else {
-		return &tls.Config{Certificates: []tls.Certificate{crt}}
 	}
+	return &tls.Config{Certificates: []tls.Certificate{crt}}
 }
 
 // GetSSLCertFromFiles - loads SSL certificate and key from their files

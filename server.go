@@ -184,5 +184,14 @@ func (s *Server) handleClient(_conn net.Conn, requireKey bool, f func(MessageInf
 	delete(s.Connections, name)
 	(*conn.Conn).Close()
 	running = false
-	s.DoneChan <- true
+	go f(MessageInfo{
+		Msg: &Message{
+			Type: "_disconnect",
+			Data: map[string]interface{}{
+				"Who": name,
+			},
+		},
+		SConn: conn,
+		From:  name,
+	})
 }

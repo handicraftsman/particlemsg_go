@@ -53,7 +53,7 @@ func (s *Server) Start(host, port string, requireKeys bool, tcfg *tls.Config, f 
 		panic(err)
 	}
 	defer l.Close()
-	fmt.Println("Listening on " + host + ":" + port)
+	fmt.Println("[ParticleMSG] Listening on " + host + ":" + port)
 	for {
 		defer func() {
 			if err := recover(); err != nil {
@@ -154,6 +154,16 @@ func (s *Server) handleClient(_conn net.Conn, requireKey bool, f func(MessageInf
 				Data: map[string]interface{}{
 					"Name": name,
 				},
+			})
+			go f(MessageInfo{
+				Msg: &Message{
+					Type: "_registered",
+					Data: map[string]interface{}{
+						"Who": name,
+					},
+				},
+				SConn: conn,
+				From:  name,
 			})
 		} else if registered && msg.Type == "_message" {
 			to := msg.Data["To"].(string)

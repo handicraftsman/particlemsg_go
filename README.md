@@ -23,6 +23,8 @@ C: {"Type": "_quit", "Data": {}}
 S: {"Type": "_quit", "Data": {"Reason": "Client Quit"}}
 ```
 
+On register server generates `{"Type": "_registered", "Data": {"Who": "pluginName"}}` message.
+
 On disconnect client generates `{"Type": "_disconnect", "Data": {}}` message.
 
 On disconnect server generates `{"Type": "_disconnect", "Data": {"Who": "pluginName"}}` message.

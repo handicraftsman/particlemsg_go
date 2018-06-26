@@ -30,7 +30,7 @@ func LoadPlugins(host, port, crt, key string, clients *ClientConfig) {
 					crt, _ = filepath.Abs(crt)
 					key, _ = filepath.Abs(key)
 
-					cmd := exec.Command(client.Path)
+					cmd := exec.Command(p)
 					cmd.Stdout = os.Stdout
 					cmd.Stderr = os.Stderr
 					cmd.Dir = d

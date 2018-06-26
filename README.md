@@ -23,6 +23,10 @@ C: {"Type": "_quit", "Data": {}}
 S: {"Type": "_quit", "Data": {"Reason": "Client Quit"}}
 ```
 
+On disconnect client generates `{"Type": "_disconnect", "Data": {}}` message.
+
+On disconnect server generates `{"Type": "_disconnect", "Data": {"Who": "pluginName"}}` message.
+
 ## Demo
 
 Check `test_client/main.go` and `test_server/main.go` for demos.

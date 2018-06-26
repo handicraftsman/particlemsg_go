@@ -23,6 +23,7 @@ type ClientInfo struct {
 	Name      string
 	Path      string
 	Key       string
+	UnsafeSSL bool
 	DoNotLoad bool
 }
 

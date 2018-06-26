@@ -2,6 +2,7 @@
   {
     "Name": "core",
     "Path": "../test_client/test_client",
-    "Key": "asdf"
+    "Key": "asdf",
+    "UnsafeSSL": true
   }
 ]

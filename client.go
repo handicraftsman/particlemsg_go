@@ -125,5 +125,13 @@ func (c *Client) Connect(host, port, key string, tcfg *tls.Config, f func(Messag
 
 	(*_conn).Close()
 	c.Running = false
+	f(MessageInfo{
+		Msg: &Message{
+			Type: "_disconnect",
+			Data: map[string]interface{}{},
+		},
+		CConn: conn,
+		From:  "_server",
+	})
 	c.DoneChan <- true
 }

@@ -8,12 +8,13 @@ import (
 	"net"
 	"os"
 	"time"
+	"sync"
 )
 
 // Server - struct representing a server. Use it when you want to listen for plugin connections
 type Server struct {
 	DoneChan    chan bool
-	Connections map[string]*ServerConnection
+	Connections *sync.Map
 	MsgChan     chan MessageInfo
 	Keys        map[string]string
 }
@@ -22,7 +23,7 @@ type Server struct {
 func NewServer() *Server {
 	return &Server{
 		DoneChan:    make(chan bool),
-		Connections: make(map[string]*ServerConnection),
+		Connections: &sync.Map{},
 		MsgChan:     make(chan MessageInfo, 16),
 		Keys:        make(map[string]string),
 	}
@@ -128,7 +129,7 @@ func (s *Server) handleClient(_conn net.Conn, requireKey bool, f func(MessageInf
 			if !registered {
 				name = msg.Data["Name"].(string)
 			}
-			if _, ok := s.Connections[name]; registered || ok {
+			if _, ok := s.Connections.Load(name); registered || ok {
 				conn.SendMessage(Message{
 					Type: "_alreadyRegistered",
 					Data: map[string]interface{}{
@@ -146,7 +147,7 @@ func (s *Server) handleClient(_conn net.Conn, requireKey bool, f func(MessageInf
 				})
 				continue
 			}
-			s.Connections[name] = conn
+			s.Connections.Store(name, conn)
 			conn.Name = name
 			registered = true
 			conn.SendMessage(Message{
@@ -168,8 +169,8 @@ func (s *Server) handleClient(_conn net.Conn, requireKey bool, f func(MessageInf
 		} else if registered && msg.Type == "_message" {
 			to := msg.Data["To"].(string)
 			message := msg.Data["Message"]
-			if _, ok := s.Connections[to]; ok {
-				s.Connections[to].SendMessage(Message{
+			if c, ok := s.Connections.Load(to); ok {
+				c.(*ServerConnection).SendMessage(Message{
 					Type: "_message",
 					Data: map[string]interface{}{
 						"From":    name,
@@ -185,7 +186,7 @@ func (s *Server) handleClient(_conn net.Conn, requireKey bool, f func(MessageInf
 				})
 			}
 		} else if msg.Type == "_quit" {
-			delete(s.Connections, name)
+			s.Connections.Delete(name)
 			conn.SendMessage(Message{
 				Type: "_quit",
 				Data: map[string]interface{}{
@@ -203,7 +204,7 @@ func (s *Server) handleClient(_conn net.Conn, requireKey bool, f func(MessageInf
 			})
 		}
 	}
-	delete(s.Connections, name)
+	s.Connections.Delete(name)
 	(*conn.Conn).Close()
 	running = false
 	go f(MessageInfo{

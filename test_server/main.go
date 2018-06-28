@@ -2,21 +2,15 @@ package main
 
 import (
 	"fmt"
-	"os"
 	"time"
 
 	"github.com/handicraftsman/particlemsg_go"
 )
 
-var (
-	host = os.Getenv("PMSG_HOST")
-	port = os.Getenv("PMSG_PORT")
-	crt  = os.Getenv("PMSG_SSL_CERT")
-	key  = os.Getenv("PMSG_SSL_KEY")
-)
-
 func main() {
 	srv := particlemsg.NewServer()
+
+	host, port, crt, key := particlemsg.GetServerConfig()
 
 	clients := particlemsg.LoadClientConfig("./clients.json")
 	srv.LoadClientConfig(clients)

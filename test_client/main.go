@@ -8,12 +8,14 @@ import (
 )
 
 func main() {
-	c := particlemsg.NewClient(os.Getenv("PMSG_NAME"))
+	name, crt, key := particlemsg.GetClientConfig()
+
+	c := particlemsg.NewClient(name)
 
 	fmt.Println(os.Getenv("ASDF"))
 
 	go c.ConnectFromEnv(
-		particlemsg.GetBasicSSLConfig(particlemsg.GetSSLCertFromFiles(os.Getenv("PMSG_SSL_CERT"), os.Getenv("PMSG_SSL_KEY"))),
+		particlemsg.GetBasicSSLConfig(particlemsg.GetSSLCertFromFiles(crt, key)),
 		func(mi particlemsg.MessageInfo) {
 			fmt.Printf("%s: %v\n", mi.From, mi.Msg)
 			if mi.Msg.Type == "_registered" {

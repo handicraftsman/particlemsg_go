@@ -29,7 +29,12 @@ func main() {
 			fmt.Printf("%s: %v\n", mi.From, mi.Msg)
 		})
 
-	particlemsg.LoadPlugins("127.0.0.1", port, crt, key, clients)
+	core, err := particlemsg.FindClientInfo(clients, "core")
+	if err != nil {
+		panic(err)
+	}
+	particlemsg.LoadPlugin("127.0.0.1", port, crt, key, core)
+	particlemsg.LoadPlugins("127.0.0.1", port, crt, key, clients, true)
 
 	<-srv.DoneChan
 }

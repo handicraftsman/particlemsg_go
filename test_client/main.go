@@ -10,6 +10,8 @@ import (
 func main() {
 	c := particlemsg.NewClient(os.Getenv("PMSG_NAME"))
 
+	fmt.Println(os.Getenv("ASDF"))
+
 	go c.ConnectFromEnv(
 		particlemsg.GetBasicSSLConfig(particlemsg.GetSSLCertFromFiles(os.Getenv("PMSG_SSL_CERT"), os.Getenv("PMSG_SSL_KEY"))),
 		func(mi particlemsg.MessageInfo) {

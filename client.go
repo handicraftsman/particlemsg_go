@@ -25,6 +25,7 @@ type ClientInfo struct {
 	Key       string
 	UnsafeSSL bool
 	DoNotLoad bool
+	Env       []string
 }
 
 // ClientConfig - an array of ClientInfos

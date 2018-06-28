@@ -3,6 +3,9 @@
     "Name": "core",
     "Path": "../test_client/test_client",
     "Key": "asdf",
-    "UnsafeSSL": true
+    "UnsafeSSL": true,
+    "Env": [
+      "ASDF=Foo bar baz"
+    ]
   }
 ]

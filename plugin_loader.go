@@ -43,6 +43,7 @@ func LoadPlugins(host, port, crt, key string, clients *ClientConfig) {
 						"PMSG_SSL_CERT="+crt,
 						"PMSG_SSL_KEY="+key,
 					)
+					cmd.Env = append(cmd.Env, client.Env...)
 					if err = cmd.Run(); err != nil {
 						panic(err)
 					}

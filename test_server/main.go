@@ -20,6 +20,8 @@ func main() {
 	clients := particlemsg.LoadClientConfig("./clients.json")
 	srv.LoadClientConfig(clients)
 
+	srv.Blocked = true
+
 	go srv.Start(
 		host,
 		port,
@@ -27,6 +29,13 @@ func main() {
 		particlemsg.GetBasicSSLConfig(particlemsg.GetSSLCertFromFiles(crt, key)),
 		func(mi particlemsg.MessageInfo) {
 			fmt.Printf("%s: %v\n", mi.From, mi.Msg)
+			if mi.Msg.Type == "_registered" {
+				who := mi.Msg.Data["Who"].(string)
+				if who == "core" {
+					srv.Blocked = false
+					particlemsg.LoadPlugins("127.0.0.1", port, crt, key, clients, true)
+				}
+			}
 		})
 
 	core, err := particlemsg.FindClientInfo(clients, "core")
@@ -34,7 +43,6 @@ func main() {
 		panic(err)
 	}
 	particlemsg.LoadPlugin("127.0.0.1", port, crt, key, core)
-	particlemsg.LoadPlugins("127.0.0.1", port, crt, key, clients, true)
 
 	<-srv.DoneChan
 }

@@ -5,10 +5,11 @@ import (
 	"crypto/sha256"
 	"crypto/tls"
 	"fmt"
+	"log"
 	"net"
 	"os"
-	"time"
 	"sync"
+	"time"
 )
 
 // Server - struct representing a server. Use it when you want to listen for plugin connections
@@ -17,6 +18,7 @@ type Server struct {
 	Connections *sync.Map
 	MsgChan     chan MessageInfo
 	Keys        map[string]string
+	Blocked     bool
 }
 
 // NewServer - creates a new server
@@ -26,6 +28,7 @@ func NewServer() *Server {
 		Connections: &sync.Map{},
 		MsgChan:     make(chan MessageInfo, 16),
 		Keys:        make(map[string]string),
+		Blocked:     false,
 	}
 }
 
@@ -129,6 +132,24 @@ func (s *Server) handleClient(_conn net.Conn, requireKey bool, f func(MessageInf
 			if !registered {
 				name = msg.Data["Name"].(string)
 			}
+			if name != "core" && s.Blocked {
+				conn.SendMessage(Message{
+					Type: "_blocked",
+					Data: map[string]interface{}{},
+				})
+				go f(MessageInfo{
+					Msg: &Message{
+						Type: "_blocked",
+						Data: map[string]interface{}{
+							"Who": name,
+						},
+					},
+					SConn: conn,
+					From:  name,
+				})
+				log.Println("Blocked " + name)
+				continue
+			}
 			if _, ok := s.Connections.Load(name); registered || ok {
 				conn.SendMessage(Message{
 					Type: "_alreadyRegistered",
@@ -136,6 +157,17 @@ func (s *Server) handleClient(_conn net.Conn, requireKey bool, f func(MessageInf
 						"Name": name,
 					},
 				})
+				go f(MessageInfo{
+					Msg: &Message{
+						Type: "_alreadyRegistered",
+						Data: map[string]interface{}{
+							"Who": name,
+						},
+					},
+					SConn: conn,
+					From:  name,
+				})
+				log.Println(name + " tried to register, but there's already a registered client that name")
 				continue
 			}
 			if k, ok := s.Keys[name]; (requireKey && !ok) || (requireKey && (key != k)) {
@@ -145,6 +177,17 @@ func (s *Server) handleClient(_conn net.Conn, requireKey bool, f func(MessageInf
 						"Key": key,
 					},
 				})
+				go f(MessageInfo{
+					Msg: &Message{
+						Type: "_invalidKey",
+						Data: map[string]interface{}{
+							"Who": name,
+						},
+					},
+					SConn: conn,
+					From:  name,
+				})
+				log.Println(name + " tried to register with invalid key")
 				continue
 			}
 			s.Connections.Store(name, conn)

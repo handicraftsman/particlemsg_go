@@ -12,6 +12,8 @@ OR
 S: {"Type": "_alreadyRegistered", "Data": {"Name": "pluginName"}}
 OR
 S: {"Type": "_invalidKey", "Data": {"Key": "a sha256-hashed key"}}
+OR
+S: {"Type": "_blocked", "Data": {}} // means that server blocks everybody except for core
 ...
 S: {"Type": "_ping", "Data": {}}
 C: {"Type": "_pong", "Data": {}}
@@ -22,6 +24,8 @@ S: {"Type": "_message", "Data": {"From": "pluginName", "Message": {"Type": "aMes
 C: {"Type": "_quit", "Data": {}}
 S: {"Type": "_quit", "Data": {"Reason": "Client Quit"}}
 ```
+
+On `_alreadyRegistered`, `_invalidKey` and `_blocked` server receives messages of same types but with `Who` data field.
 
 On register server generates `{"Type": "_registered", "Data": {"Who": "pluginName"}}` message.
 

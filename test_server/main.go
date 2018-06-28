@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"time"
 
 	"github.com/handicraftsman/particlemsg_go"
 )
@@ -35,6 +36,13 @@ func main() {
 					srv.Blocked = false
 					particlemsg.LoadPlugins("127.0.0.1", port, crt, key, clients, true)
 				}
+				time.Sleep(time.Second)
+				srv.Broadcast(particlemsg.Message{
+					Type: "newPlugin",
+					Data: map[string]interface{}{
+						"Who": who,
+					},
+				})
 			}
 		})
 

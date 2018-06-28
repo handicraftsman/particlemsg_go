@@ -261,3 +261,15 @@ func (s *Server) handleClient(_conn net.Conn, requireKey bool, f func(MessageInf
 		From:  name,
 	})
 }
+
+// Broadcast - broadcasts given message over all connections
+func (s *Server) Broadcast(msg Message) {
+	jl := MessageToJSON(msg)
+	s.Connections.Range(func(_, _v interface{}) bool {
+		go func() {
+			v := _v.(*ServerConnection)
+			(*v.Conn).Write([]byte(jl + "\r\n"))
+		}()
+		return true
+	})
+}

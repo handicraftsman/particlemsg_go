@@ -228,6 +228,28 @@ func (s *Server) handleClient(_conn net.Conn, requireKey bool, f func(MessageInf
 					},
 				})
 			}
+		} else if registered && msg.Type == "_subscribe" {
+			t := msg.Data["Type"].(string)
+			d := msg.Data["Pattern"].(map[string]interface{})
+			id := msg.Data["ID"].(string)
+			once := msg.Data["Once"].(bool)
+			conn.Subscribe(t, &d, id, once)
+			conn.SendMessage(Message{
+				Type: "_subscribed",
+				Data: map[string]interface{}{
+					"ID": id,
+				},
+			})
+		} else if registered && msg.Type == "_unsubscribe" {
+			id := msg.Data["ID"].(string)
+			if conn.Unsubscribe(id) {
+				conn.SendMessage(Message{
+					Type: "_unsubscribed",
+					Data: map[string]interface{}{
+						"ID": id,
+					},
+				})
+			}
 		} else if msg.Type == "_quit" {
 			s.Connections.Delete(name)
 			conn.SendMessage(Message{
@@ -269,6 +291,20 @@ func (s *Server) Broadcast(msg Message) {
 		go func() {
 			v := _v.(*ServerConnection)
 			(*v.Conn).Write([]byte(jl + "\r\n"))
+		}()
+		return true
+	})
+}
+
+// BroadcastToSubscribed - broadcasts message to connections which are subscribed to it
+func (s *Server) BroadcastToSubscribed(msg Message) {
+	jl := MessageToJSON(msg)
+	s.Connections.Range(func(_, _v interface{}) bool {
+		go func() {
+			v := _v.(*ServerConnection)
+			if v.IsSubscribedTo(msg) {
+				(*v.Conn).Write([]byte(jl + "\r\n"))
+			}
 		}()
 		return true
 	})

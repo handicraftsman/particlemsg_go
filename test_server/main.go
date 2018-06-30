@@ -37,6 +37,12 @@ func main() {
 						"Who": who,
 					},
 				})
+			} else if mi.Msg.Type == "_subscribe" {
+				time.Sleep(time.Second)
+				srv.BroadcastToSubscribed(particlemsg.Message{
+					Type: mi.Msg.Data["Type"].(string),
+					Data: mi.Msg.Data["Pattern"].(map[string]interface{}),
+				})
 			}
 		})
 

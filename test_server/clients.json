@@ -4,6 +4,7 @@
     "Path": "../test_client/test_client",
     "Key": "asdf",
     "UnsafeSSL": true,
+    "DoNotLoad": true,
     "Env": [
       "ASDF=Foo bar baz"
     ]

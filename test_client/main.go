@@ -19,13 +19,16 @@ func main() {
 		func(mi particlemsg.MessageInfo) {
 			fmt.Printf("%s: %v\n", mi.From, mi.Msg)
 			if mi.Msg.Type == "_registered" {
-				mi.CConn.SendTo(os.Getenv("PMSG_NAME"), particlemsg.Message{
+				mi.CConn.SendTo(name, particlemsg.Message{
 					Type: "foo",
 					Data: map[string]interface{}{
 						"foo": "bar",
 						"baz": "quux",
 					},
 				})
+				c.Subscribe("foo", "foo", map[string]interface{}{
+					"Foo": "Bar",
+				}, true)
 			}
 		})
 

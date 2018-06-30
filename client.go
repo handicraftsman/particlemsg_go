@@ -71,6 +71,7 @@ func (c *Client) Connect(host, port, key string, tcfg *tls.Config, f func(Messag
 
 	conn := NewClientConnection(_conn)
 	conn.Name = c.Name
+	c.Conn = conn
 	defer func() {
 		if err := recover(); err != nil {
 			conn.SendMessage(Message{
@@ -136,4 +137,28 @@ func (c *Client) Connect(host, port, key string, tcfg *tls.Config, f func(Messag
 		From:  "_server",
 	})
 	c.DoneChan <- true
+}
+
+// Subscribe - subscribes client to the given pattern
+func (c *Client) Subscribe(id, t string, pattern map[string]interface{}, once bool) {
+	m := Message{
+		Type: "_subscribe",
+		Data: map[string]interface{}{
+			"ID":      id,
+			"Type":    t,
+			"Pattern": pattern,
+			"Once":    once,
+		},
+	}
+	c.Conn.SendMessage(m)
+}
+
+// Unsubscribe - unsubscribes client from the given pattern
+func (c *Client) Unsubscribe(id string) {
+	c.Conn.SendMessage(Message{
+		Type: "_unsubscribe",
+		Data: map[string]interface{}{
+			"ID": id,
+		},
+	})
 }
